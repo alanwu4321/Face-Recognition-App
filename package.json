@@ -1,0 +1,37 @@
+{
+  "name": "facerecognitionbrain",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@material-ui/core": "^3.9.3",
+    "@material-ui/icons": "^3.0.2",
+    "bootstrap": "^4.3.1",
+    "clarifai": "^2.9.0",
+    "color-convert": "^2.0.0",
+    "data-uri-to-buffer": "^2.0.1",
+    "html2canvas": "^1.0.0-rc.1",
+    "react": "^16.8.6",
+    "react-bootstrap": "^1.0.0-beta.8",
+    "react-dom": "^16.8.6",
+    "react-particles-js": "^2.6.0",
+    "react-scripts": "2.0.3",
+    "react-tilt": "^0.1.4",
+    "tachyons": "^4.11.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "deploy": "aws s3 sync build/ s3://asianglow-index.com",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "dotenv": "^8.0.0"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}
