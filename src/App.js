@@ -13,7 +13,7 @@ import ColorDetect from './components/ColorDetect/ColorDetect';
 import CelebDetect from './components/CelebDetect/CelebDetect';
 
 const app = new Clarifai.App({
-  apiKey: REACT_APP_API_KEY
+  apiKey: process.env.REACT_APP_API_KEY
 });
 
 const particlesOptions = {
@@ -146,7 +146,7 @@ class App extends Component {
           const raw_hex = response.outputs[0].data.colors[0].raw_hex
           const api_rgb = convert.hex.rgb(raw_hex)
           const hex_name = response.outputs[0].data.colors[0].w3c.name
-          
+
           //Traverse through each pixel on the face to find average color
           // only visit every 5 pixels
           var blockSize = 5, 
