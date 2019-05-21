@@ -54,16 +54,35 @@ class App extends Component {
     require('dotenv').config()
   }
 
-  loadUser = (data) => {
-    this.setState({
-      user: {
-        id: data._id,
-        name: data.name,
-        email: data.email,
-        entries: data.entries,
-        joined: data.joined
-      }
+  uploadPicture = (input, callback) => {
+    const rawUrl = process.env.REACT_APP_LAMDA_ENDPOINT + 'upload/inputURL'
+    fetch(rawUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        "userInput": input
+      })
     })
+      .then(response => response.json())
+      .then(inputURL => {
+        var url = process.env.REACT_APP_S3_ENDPOINT + inputURL.fileName
+        callback(url)
+      })
+  }
+
+
+  onFaceDetect = (dataURL, callback) => {
+    fetch(process.env.REACT_APP_LAMDA_ENDPOINT + 'upload/imgData', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        "imageData": dataURL
+      })
+    })
+      .then(response => response.json())
+      .then(s3Meta => {
+        callback(s3Meta.fileName)
+      })
   }
 
 
@@ -83,7 +102,6 @@ class App extends Component {
 
   //Duplicate input image on Canvas and store the "face" in AWS S3 Bucket
   duplicateImage = (box, callback) => {
-
     //Dom elements
     const tempCanvas = document.getElementById("canvasTemp");
     const faceCanvas = document.getElementById("canvasFace");
@@ -128,7 +146,8 @@ class App extends Component {
           const raw_hex = response.outputs[0].data.colors[0].raw_hex
           const api_rgb = convert.hex.rgb(raw_hex)
           const hex_name = response.outputs[0].data.colors[0].w3c.name
-
+          
+          //Traverse through each pixel on the face to find average color
           // only visit every 5 pixels
           var blockSize = 5, 
             i = -4,
@@ -164,6 +183,18 @@ class App extends Component {
     this.setState({ input: event.target.value });
   }
 
+  loadUser = (data) => {
+    this.setState({
+      user: {
+        id: data._id,
+        name: data.name,
+        email: data.email,
+        entries: data.entries,
+        joined: data.joined
+      }
+    })
+  }
+
   onButtonSubmit = () => {
     this.uploadPicture(this.state.input, (imgSource) => {
       this.setState({ imageUrl: imgSource });
@@ -195,41 +226,6 @@ class App extends Component {
 
     })
   }
-
-  uploadPicture = (input, callback) => {
-    const rawUrl = process.env.REACT_APP_LAMDA_ENDPOINT + 'upload/inputURL'
-    fetch(rawUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        "userInput": input
-      })
-    })
-      .then(response => response.json())
-      .then(inputURL => {
-        var url = process.env.REACT_APP_S3_ENDPOINT + inputURL.fileName
-        callback(url)
-      })
-  }
-
-
-  onFaceDetect = (dataURL, callback) => {
-    fetch(process.env.REACT_APP_LAMDA_ENDPOINT + 'upload/imgData', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        "imageData": dataURL
-      })
-    })
-      .then(response => response.json())
-      .then(s3Meta => {
-        callback(s3Meta.fileName)
-      })
-  }
-
-
-  
-
 
   onRouteChange = (route) => {
     if (route === 'signout') {
